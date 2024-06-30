@@ -23,7 +23,7 @@ def train(model, training_loader, optimizer, show_progress, i):
 
         nr_batches_train+=1
 
-        print('Minibatch nr: ',nr_batches_train, 'Loss: ', loss.item())
+        # print('Minibatch nr: ',nr_batches_train, 'Loss: ', loss.item())
 
 def eval(model, validation_loader):
     model.eval()
@@ -52,8 +52,8 @@ torch.manual_seed(333)
 
 
 # from hoai u6
-for epoch in range(4):
-    train(model, training_loader, optimizer, False, epoch) 
+for epoch in range(10):
+    train(model, training_loader, optimizer, True, epoch) 
     val_loss = eval(model, validation_loader)
 
     print("-" * 100)
