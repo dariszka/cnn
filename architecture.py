@@ -4,10 +4,10 @@ import torch.nn as nn
 class MyCNN(nn.Module):
     def __init__(self,
                 input_channels: int = 1,
-                hidden_channels: list =[32,64,128],
+                hidden_channels: list =[32, 64, 128, 64],
                 use_batchnormalization: bool = True,
                 num_classes: int = 20,
-                kernel_size: list = [3,5,3],
+                kernel_size: list = [3,3,3,5],
                 activation_function: torch.nn.Module = torch.nn.ReLU()):
         super().__init__()
         layers = []
@@ -27,11 +27,13 @@ class MyCNN(nn.Module):
 
         self.layers = nn.Sequential(*layers)
         self.flatten = nn.Flatten() 
+        self.dropout = nn.Dropout(p=0.5)
         self.output_layer = nn.Linear(in_features=in_features*100*100, out_features=num_classes)
     
     def forward(self, input_images: torch.Tensor):
         x = self.layers(input_images)
         x = self.flatten(x)
+        x = self.dropout(x)
         return self.output_layer(x)
 
 torch.manual_seed(333)        

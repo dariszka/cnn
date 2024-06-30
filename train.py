@@ -2,20 +2,21 @@ from architecture import model
 import torch
 import config
 from split import test_loader,validation_loader,training_loader
+from tqdm import tqdm 
 
 # from my a5_ex1
-def train(model, training_loader, optimizer):
+def train(model, training_loader, optimizer, show_progress, i):
     model.train()
     minibatch_loss_train = 0
     nr_batches_train = 0
 
-    for input, target, _,_ in training_loader:
+    loop_train = tqdm(training_loader, desc=f"train epoch {i}") if show_progress else training_loader
+
+    for input, target, _,_ in loop_train:
         output = model(input)
         loss = loss_f(output, target)
 
         loss.backward()
-
-        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 
         optimizer.step()
         optimizer.zero_grad()
@@ -41,18 +42,18 @@ def eval(model, validation_loader):
     return average_loss_eval_i
 
 
-# from hoai u6
 num_epochs = config.num_epochs
 best_val_loss = None
 loss_f = torch.nn.CrossEntropyLoss()
 train_losses, val_losses = [],[]
 lr =0.00001
-optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=0.001)
 torch.manual_seed(333)
 
 
-for epoch in range(3):
-    train(model, training_loader, optimizer) 
+# from hoai u6
+for epoch in range(4):
+    train(model, training_loader, optimizer, False, epoch) 
     val_loss = eval(model, validation_loader)
 
     print("-" * 100)
@@ -63,7 +64,6 @@ for epoch in range(3):
         torch.save(model.state_dict(), "model.pth")
         best_val_loss = val_loss
     else:
-        # Anneal the learning rate if no improvement has been seen in the validation dataset.
         lr /= 4.0
         for g in optimizer.param_groups:
             g["lr"] = lr
