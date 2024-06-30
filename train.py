@@ -1,7 +1,6 @@
 from architecture import model
 import torch
-import config
-from split import test_loader,validation_loader,training_loader
+from split import validation_loader,training_loader
 from tqdm import tqdm 
 
 # from my a5_ex1
@@ -14,8 +13,8 @@ def train(model, training_loader, optimizer, show_progress, i):
 
     for input, target, _,_ in loop_train:
         output = model(input)
+        
         loss = loss_f(output, target)
-
         loss.backward()
 
         optimizer.step()
@@ -41,29 +40,29 @@ def eval(model, validation_loader):
     average_loss_eval_i = loss_eval / nr_batches_eval
     return average_loss_eval_i
 
-
-num_epochs = config.num_epochs
 best_val_loss = None
 loss_f = torch.nn.CrossEntropyLoss()
-train_losses, val_losses = [],[]
 lr =0.00001
 optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=0.001)
-torch.manual_seed(333)
 
+# assignment description didn't say if we're to wrap the code execution blocks in an if name main, 
+# but the rest of the assignments for the semester did so, so I'm doing it here as well, 
+# I hope it won't be a problem
+if __name__ == '__main__':
+    # from hoai u6
+    torch.manual_seed(333)
+    for epoch in range(10):
+        train(model, training_loader, optimizer, True, epoch) 
+        val_loss = eval(model, validation_loader)
 
-# from hoai u6
-for epoch in range(10):
-    train(model, training_loader, optimizer, True, epoch) 
-    val_loss = eval(model, validation_loader)
-
-    print("-" * 100)
-    print(f"| end of epoch {epoch:3d}", f"| valid loss {val_loss:5.2f}")
-    print("-" * 100)
-    
-    if not best_val_loss or val_loss < best_val_loss:
-        torch.save(model.state_dict(), "model.pth")
-        best_val_loss = val_loss
-    else:
-        lr /= 4.0
-        for g in optimizer.param_groups:
-            g["lr"] = lr
+        print("-" * 50)
+        print(f"| end of epoch {epoch:3d}", f"| valid loss {val_loss:5.2f}")
+        print("-" * 50)
+        
+        if not best_val_loss or val_loss < best_val_loss:
+            torch.save(model.state_dict(), "model.pth")
+            best_val_loss = val_loss
+        else:
+            lr /= 4.0
+            for g in optimizer.param_groups:
+                g["lr"] = lr

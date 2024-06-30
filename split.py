@@ -1,18 +1,16 @@
 import os
 from torch.utils.data import DataLoader, Subset
 from dataset import ImagesDataset
-import config 
 import numpy as np
 
 # from 05_data_loading.py 
-
 rng = np.random.default_rng(seed=333)
 
 path = os.path.abspath('training_data')
-batch_size = config.batch_size
-train_split = config.train_split
-val_split = config.val_split
-test_split = config.test_split
+batch_size = 64
+train_split = 0.7
+val_split = 0.2
+test_split = 0.1
 
 ds = ImagesDataset(path)
 
