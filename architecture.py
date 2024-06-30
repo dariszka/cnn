@@ -37,4 +37,5 @@ class MyCNN(nn.Module):
         return self.output_layer(x)
 
 torch.manual_seed(333)        
-model = MyCNN()
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+model = MyCNN().to(device=device)

@@ -6,12 +6,14 @@ from tqdm import tqdm
 # from my a5_ex1
 def train(model, training_loader, optimizer, show_progress, i):
     model.train()
-    minibatch_loss_train = 0
     nr_batches_train = 0
 
     loop_train = tqdm(training_loader, desc=f"train epoch {i}") if show_progress else training_loader
 
     for input, target, _,_ in loop_train:
+        input = input.to(device)
+        target = target.to(device)
+
         output = model(input)
         
         loss = loss_f(output, target)
@@ -31,6 +33,8 @@ def eval(model, validation_loader):
 
     with torch.no_grad():
         for input, target, _, _ in validation_loader:
+            input = input.to(device)
+            target = target.to(device)
             output = model(input)
             loss = loss_f(output, target)
 
@@ -40,6 +44,8 @@ def eval(model, validation_loader):
     average_loss_eval_i = loss_eval / nr_batches_eval
     return average_loss_eval_i
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+model.to(device)
 best_val_loss = None
 loss_f = torch.nn.CrossEntropyLoss()
 lr =0.00001
