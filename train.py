@@ -57,7 +57,7 @@ if __name__ == '__main__':
         train(model, training_loader, optimizer, True, epoch) 
         val_loss = eval(model, validation_loader)
 
-        print("-" * 50, f"| end of epoch {epoch:3d}", f"| valid loss {val_loss:5.3f}", "-" * 50)
+        print("-" * 50, '\n', f"| end of epoch {epoch:3d}", f"| valid loss {val_loss:5.3f}", '\n', "-" * 50)
            
         if not best_val_loss or val_loss < best_val_loss:
             torch.save(model.state_dict(), "model.pth")
