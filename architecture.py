@@ -36,8 +36,11 @@ class MyCNN(nn.Module):
         self.flatten = nn.Flatten() 
         self.dropout = nn.Dropout(p=0.5)
 
-        # in_features=in_features*100*100 - 3*len(hidden_channels)
-        self.output_layer = nn.Linear(in_features=in_features*3*3, out_features=num_classes)
+        out_size = 100 # it's hardcoded, but since all the pictures are 100*100, I don't think it matters
+        for i in range(pooling_layers):
+            out_size = (out_size-2)//2 + 1 
+
+        self.output_layer = nn.Linear(in_features=in_features*out_size*out_size, out_features=num_classes)
     
     def forward(self, input_images: torch.Tensor):
         x = self.layers(input_images)
