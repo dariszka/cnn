@@ -1,12 +1,11 @@
 from architecture import model
 import torch
-from split import validation_loader,training_loader
+from split import validation_loader,training_loader, set_seed
 from tqdm import tqdm 
 
 # from my a5_ex1
 def train(model, training_loader, optimizer, show_progress, i):
     model.train()
-    nr_batches_train = 0
 
     loop_train = tqdm(training_loader, desc=f"train epoch {i}") if show_progress else training_loader
 
@@ -21,10 +20,6 @@ def train(model, training_loader, optimizer, show_progress, i):
 
         optimizer.step()
         optimizer.zero_grad()
-
-        nr_batches_train+=1
-
-        # print('Minibatch nr: ',nr_batches_train, 'Loss: ', loss.item())
 
 def eval(model, validation_loader):
     model.eval()
@@ -46,18 +41,19 @@ def eval(model, validation_loader):
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model.to(device)
+
 best_val_loss = None
 loss_f = torch.nn.CrossEntropyLoss()
-lr =0.00001
-optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=0.001)
+lr =0.00009
+optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=0.003)
 
 # assignment description didn't say if we're to wrap the code execution blocks in an if name main, 
 # but the rest of the assignments for the semester did so, so I'm doing it here as well, 
-# I hope it won't be a problem
+# I hope it won't be a problem 
 if __name__ == '__main__':
+    set_seed(333)
     # from hoai u6
-    torch.manual_seed(333)
-    for epoch in range(10):
+    for epoch in range(30):
         train(model, training_loader, optimizer, True, epoch) 
         val_loss = eval(model, validation_loader)
 
@@ -69,6 +65,6 @@ if __name__ == '__main__':
             torch.save(model.state_dict(), "model.pth")
             best_val_loss = val_loss
         else:
-            lr /= 4.0
+            lr /= 10.0
             for g in optimizer.param_groups:
                 g["lr"] = lr
